@@ -1,0 +1,4 @@
+digraph {
+	Hello [label=World]
+	Hello -> World
+}
