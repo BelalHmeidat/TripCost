@@ -32,6 +32,7 @@ def get_raw_list():
 # routes = get_raw_list()
 city_list = None
 
+
 # Method that returns the char of indexes
 def get_dict_of_cities(routes):
     char_to_indx = {}
@@ -44,25 +45,25 @@ def get_dict_of_cities(routes):
 
 char_to_indx = None
 
+
 def map_cities(raw_list):
     l = len(raw_list)
     cost_table = [[-1 for i in range(l)] for j in range(l)]  # -1: empty cell
-    label_table = [['0' for i in range(l)] for j in range(l)]
+    # label_table = [['0' for i in range(l)] for j in range(l)]
 
     for i in range(l):
         for j in range(l):
-            if (j <= i):
+            if j <= i:
                 cost_table[i][j] = 0
 
     for i in range(len(raw_list)):
         for j in range(1, len(raw_list[i])):
             city = raw_list[i][j][0]
             cost = raw_list[i][j][1] + raw_list[i][j][2]
-            label_table[i][char_to_indx[city]] = city
+            # label_table[i][char_to_indx[city]] = city
             cost_table[i][char_to_indx[city]] = cost
 
     return cost_table
-
 
 
 # Method that returns the label of the city from it's assigned index
@@ -70,7 +71,7 @@ def index_to_char(index):
     return city_list[index][0]
 
 
-def get_routes_2(cost_map, start, end):
+def find_routes_without_dynamic(cost_map, start, end):
     suggested_routes = []
 
     start_row = char_to_indx[start]
@@ -89,7 +90,7 @@ def get_routes_2(cost_map, start, end):
         while next_col != start_row:
             route_count = 0
             j = next_col
-            for row in range(start_row, len(clone)):
+            for row in range(start_row, end_col + 1):
                 if clone[row][j] > 0:
                     route_count += 1
                     # j = next_col
@@ -107,7 +108,7 @@ def get_routes_2(cost_map, start, end):
 
 # Method that updates the row of the source city in the table of route costs with optimal costs. It takes the cost
 # table and returns a vector
-def get_route_3(cost_map, src_city, dest_city):
+def find_dynamic_route(cost_map, src_city, dest_city):
     clone = []
     for row in cost_map:
         clone.append(row.copy())
@@ -118,7 +119,7 @@ def get_route_3(cost_map, src_city, dest_city):
     # to that said city and places it in the cell that joins the source with the path
     for j in range(src + 1, dest + 1):
         # looping over each city from source to destination no need to start at source as it
-        # will always be zero from source ti itself
+        # will always be zero from source to itself
         optimal = clone[src][j]
         # variable to store the optimal path it. This is just the initial value of it. It will be compared with every
         # alternative path found after and updated if any shorter one was found
@@ -135,18 +136,23 @@ def get_route_3(cost_map, src_city, dest_city):
             #  Optimal paths are updated in the cell that joins the source with the current city we are at
             clone[src][j] = optimal  # updating cost with source city
             label_vector[j] = index_to_char(i)  # labeling the city that lead to that path
+            print(j, index_to_char(i))
     # for i in clone: print(i)
     path = [dest_city]
     current_city = dest
     while current_city != src:
         path.append(label_vector[current_city])
-        current_city = char_to_indx[label_vector[current_city]]
+        print(label_vector, current_city)
+        if label_vector[current_city] == '0':
+            current_city = src
+        else :
+            current_city = char_to_indx[label_vector[current_city]]
     path.reverse()
     path.append(clone[src][dest])
     return path
 
 
-def get_all_routes(cost_map, src_city, dest_city):
+def compile_dynamic_routes(cost_map, src_city, dest_city):
     clone = []
     for row in cost_map:
         clone.append(row.copy())
@@ -177,7 +183,7 @@ def get_all_routes(cost_map, src_city, dest_city):
                     cost = clone[row][j]
             curr_col = selected
 
-        all_routes.append(get_route_3(clone, src_city, dest_city))
+        all_routes.append(find_dynamic_route(clone, src_city, dest_city))
         # for row in clone:
         #     print(row)
         clone[cell_to_remove[0]][cell_to_remove[1]] = -1
@@ -185,33 +191,33 @@ def get_all_routes(cost_map, src_city, dest_city):
     return all_routes
 
 
-def get_all_routes2(cost_map, src_city, dest_city):
-    clone = []
-    for row in cost_map:
-        clone.append(row.copy())
-
-    optimal = get_route_3(cost_map, src_city, dest_city)
-    optimals = [optimal]
-
-    for col in optimal[1:-1]:
-        j = char_to_indx[col]
-        count = 0
-        for i1 in range(len(clone)):
-            if clone[i1][j] == 0 or clone[i1][j] == -1: continue
-            count += 1
-            if count >= 2:
-                clone[i1][j] = -1
-                optimals.append(get_route_3(clone, src_city, dest_city))
-
-    return optimals
+# def get_all_routes2(cost_map, src_city, dest_city):
+#     clone = []
+#     for row in cost_map:
+#         clone.append(row.copy())
+#
+#     optimal = get_route_3(cost_map, src_city, dest_city)
+#     optimals = [optimal]
+#
+#     for col in optimal[1:-1]:
+#         j = char_to_indx[col]
+#         count = 0
+#         for i1 in range(len(clone)):
+#             if clone[i1][j] == 0 or clone[i1][j] == -1: continue
+#             count += 1
+#             if count >= 2:
+#                 clone[i1][j] = -1
+#                 optimals.append(get_route_3(clone, src_city, dest_city))
+#
+#     return optimals
 
 
 def global_find_route(routes, src_city, dest_city):
     global char_to_indx
     char_to_indx = get_dict_of_cities(routes)
     cost_map = map_cities(routes)
-    list_of_routes = get_all_routes(cost_map, src_city, dest_city)
-    for i in get_routes_2(cost_map, src_city, dest_city):
+    list_of_routes = compile_dynamic_routes(cost_map, src_city, dest_city)
+    for i in find_routes_without_dynamic(cost_map, src_city, dest_city):
         cost = i[-1]
         s = slice(0, -1)
         i = i[s]
@@ -226,7 +232,7 @@ def global_find_route(routes, src_city, dest_city):
     return unique_data
 
 
-# for item in global_find_route(routes, 'a', 'i'):
+# for item in global_find_route(get_raw_list(), 'b', 'i'):
 #     print(item)
 
 def process_file(file):
@@ -259,7 +265,7 @@ def process_file(file):
             line = line.replace(']', '')
             line = line.replace('[', '')
             adjacents = str.split(line, ':')
-            city = [city,]
+            city = [city, ]
             for adj in adjacents:
                 if str.isspace(adj): continue
                 elements = str.split(adj, ',')
@@ -268,9 +274,6 @@ def process_file(file):
                     missing_end_city = elements[0]
                 city.append(nighbor)
             cities.append(city)
-    cities.append([missing_end_city,])
+    cities.append([missing_end_city, ])
     # for  city in cities: print(city)
     return cities, cities_num, begin_city, end_city
-
-
-
