@@ -2,32 +2,33 @@ graph G {
 	node [style=filled]
 	edge [dir=forward]
 	start [fillcolor=green]
-	start -- A [label=92 color=darkgreen penwidth=3]
-	start -- B
+	start -- A
+	start -- B [label=88 color=darkgreen penwidth=3]
 	start -- C
-	A [fillcolor=lightblue]
-	A -- D [label=58 color=darkgreen penwidth=3]
+	A -- D
 	A -- E
+	B [fillcolor=lightblue]
 	B -- D
-	B -- E
+	B -- E [label=80 color=darkgreen penwidth=3]
 	C -- D
 	C -- E
-	D [fillcolor=lightblue]
-	D -- F [label=75 color=darkgreen penwidth=3]
+	D -- F
 	D -- G
 	D -- H
 	D -- I
+	E [fillcolor=lightblue]
 	E -- F
-	E -- G
+	E -- G [label=80 color=darkgreen penwidth=3]
 	E -- H
 	E -- I
-	F [fillcolor=lightblue]
 	F -- J
 	F -- K
-	F -- L [label=75 color=darkgreen penwidth=3]
+	F -- L
+	G [fillcolor=lightblue]
 	G -- J
 	G -- K
 	G -- L
+	G -- end [label=2 color=darkgreen penwidth=3]
 	H -- J
 	H -- K
 	H -- L
@@ -36,7 +37,6 @@ graph G {
 	I -- L
 	J -- end
 	K -- end
-	L [fillcolor=lightblue]
-	L -- end [label=10 color=darkgreen penwidth=3]
+	L -- end
 	end [fillcolor=red]
 }

@@ -6,7 +6,6 @@ from customtkinter import filedialog
 
 # TODO: show DP Table
 # TODO: Going from point other than start
-# TODO: improve Dynamic
 # TODO: Add Comments
 # TODO: Check if route is possible
 
@@ -160,7 +159,7 @@ def select_next_route():
     next_route_bt.configure(state="enabled")
     prev_route_bt.configure(state="enabled")
     color_selected_path_map(best_paths[current_path_indx][:-1], city_list)
-    if current_path_indx == min(max_num_of_paths - 1, len(best_paths) - 1, 22):
+    if current_path_indx == min(max_num_of_paths - 1, len(best_paths) - 2):
         # 22 is the max number of routes that can be displayed on the canvas
         next_route_bt.configure(state="disabled")
     # if current_path_indx % 10 == 0:
@@ -170,9 +169,10 @@ def select_next_route():
 
 def select_prev_route():
     global best_paths, current_path_indx, max_num_of_paths, pointer
+    page_size = len(best_paths)
     canvas.move(pointer, 0, -70)
     pointer_pos = canvas.bbox(pointer)[1]
-    if pointer_pos not in range(int(canvas.yview()[0] * 23 * 70), int(canvas.yview()[1] * 23 * 70)):
+    if pointer_pos not in range(int(canvas.yview()[0] * page_size * 70), int(canvas.yview()[1] * page_size * 70)):
         canvas.yview_scroll(-1, "pages")
 
     current_path_indx -= 1
@@ -316,18 +316,29 @@ end_city_entry.configure(command=lambda x: list_and_color_best_path(start_city_e
 
 
 def open_table_window():
-    route = best_paths[current_path_indx]
+    # route = best_paths[current_path_indx]
     table_window = ctk.CTkToplevel(app)
     table_window.title("Dynamic Programming Table")
-    table_window.geometry("400x200")
+    table_window.geometry("600x800")
     table_window.resizable(False, False)
 
-    table_canvas = ctk.CTkCanvas(table_window, width=800, height=600)
-    table_canvas.pack()
+    # table_canvas = ctk.CTkCanvas(table_window, width=800, height=600)
+    # table_canvas.pack()
 
-    table_canvas.create_text(200, 20, text="Dynamic Programming Table", font=("Arial", 20))
-    dp_table = ctk.CTkTabview(table_canvas, width=800, height=600)
-    dp_table.pack()
+    # table_canvas.create_text(200, 20, text="Dynamic Programming Table", font=("Arial", 20))
+    # dp_table = ctk.CTkTabview(table_canvas, width=800, height=600)
+    # dp_table.pack()
+
+    table_area = ctk.CTkLabel(master=table_window, text=main.table)
+    table_area.pack(side=ctk.TOP, padx=20, pady=20, fill=ctk.BOTH, expand=True)
+
+    # table_text_area = ctk.CTkTextbox(master=table_window, text=main.table)
+    # table_text_area.pack(side=ctk.TOP, padx=20, pady=20, fill=ctk.BOTH, expand=True)
+    # table_text_area.insert(index=0.0, text=main.table)
+
+    label_vector_lb = ctk.CTkLabel(master=table_window, text=main.label_vector_interface)
+    label_vector_lb.pack(side=ctk.TOP, padx=20, pady=20, fill=ctk.BOTH, expand=True)
+
 
 
 show_dp_table_bt.configure(command=lambda: open_table_window())
